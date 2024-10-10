@@ -2,21 +2,27 @@ const express = require('express');
 const http = require('http');
 const WebSocket = require('ws');
 const mongoose = require('mongoose');
+require('dotenv').config(); // Load environment variables
 
-// Conectar ao MongoDB
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/chatapp');
+// Connect to MongoDB using the connection string from the environment
+mongoose.connect(process.env.MONGO_URL, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+  .then(() => console.log('Connected to MongoDB'))
+  .catch((error) => console.log('MongoDB connection error:', error));
 
-// Definir schemas
+// Define schemas
 const UserSchema = new mongoose.Schema({
   username: String,
-  status: { type: String, default: 'online' } // Adicionar campo de status ao usuário
+  status: { type: String, default: 'online' } // Add status field to user
 });
 
 const MessageSchema = new mongoose.Schema({
   user: String,
   text: String,
   timestamp: Date,
-  recipient: String, // Para mensagens privadas, armazenamos o destinatário
+  recipient: String, // For private messages, store the recipient
 });
 
 const User = mongoose.model('User', UserSchema);
@@ -26,10 +32,10 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-// Mapeamento de clientes WebSocket ativos
+// Mapping of active WebSocket clients
 const clients = new Map();
 
-// Função para enviar lista atualizada de usuários com status
+// Function to broadcast updated user list
 function broadcastUserList() {
   const userList = Array.from(clients.values()).map((client) => ({
     username: client.username,
@@ -45,76 +51,76 @@ function broadcastUserList() {
 
 app.use(express.static('public'));
 
-// Gerenciar conexão WebSocket
+// Manage WebSocket connection
 wss.on('connection', (ws) => {
-  console.log('Novo cliente conectado');
+  console.log('New client connected');
 
-  // Definir o status padrão do usuário como 'online'
+  // Set default user status to 'online'
   ws.status = 'online';
 
   ws.on('message', async (message) => {
     const data = JSON.parse(message);
-    console.log('Recebido:', data);
+    console.log('Received:', data);
 
     if (data.type === 'join') {
       if (!data.username) {
-        console.log('Erro: Nome de usuário não fornecido');
+        console.log('Error: Username not provided');
         return;
       }
 
-      // Normalizar o nome de usuário para evitar problemas com maiúsculas/minúsculas
+      // Normalize username to avoid case sensitivity issues
       ws.username = data.username.toLowerCase();
-      console.log(`Cliente conectado: ${ws.username}`);  // Confirmação de que o usuário foi atribuído corretamente
+      console.log(`Client connected: ${ws.username}`);  // Confirm user assignment
       clients.set(ws.username, ws);
 
-      // Verificar se o usuário já está no banco de dados e atualizar o status
+      // Check if the user exists in the database and update their status
       let user = await User.findOne({ username: ws.username });
       if (!user) {
         user = new User({ username: ws.username, status: ws.status });
         await user.save();
       } else {
-        // Atualizar status do usuário existente
+        // Update the status of the existing user
         user.status = 'online';
         await user.save();
       }
 
-      // Enviar a lista atualizada de usuários a todos os clientes
+      // Broadcast updated user list to all clients
       broadcastUserList();
     }
 
-    // Enviar mensagem pública ou privada
+    // Handle public or private messages
     else if (data.type === 'message' || data.type === 'private_message') {
       const chatMessage = new Message({
         user: ws.username,
         text: data.text,
         timestamp: new Date(),
-        recipient: data.recipient ? data.recipient.toLowerCase() : null, // Normalizar o nome do destinatário
+        recipient: data.recipient ? data.recipient.toLowerCase() : null, // Normalize recipient name
       });
       await chatMessage.save();
 
       if (data.type === 'message') {
-        // Mensagem pública
+        // Public message
         wss.clients.forEach((client) => {
           if (client.readyState === WebSocket.OPEN) {
             client.send(JSON.stringify({ type: 'message', data: chatMessage }));
           }
         });
       } else {
-        // Mensagem privada
+        // Private message
         const recipientUsername = data.recipient.toLowerCase();
         const recipientWs = clients.get(recipientUsername);
-        console.log(`Enviando mensagem privada de ${ws.username} para ${recipientUsername}`);
+        console.log(`Sending private message from ${ws.username} to ${recipientUsername}`);
 
         if (recipientWs && recipientWs.readyState === WebSocket.OPEN) {
           recipientWs.send(JSON.stringify({ type: 'private_message', data: chatMessage }));
-          ws.send(JSON.stringify({ type: 'private_message', data: chatMessage })); // Enviar confirmação ao remetente
+          ws.send(JSON.stringify({ type: 'private_message', data: chatMessage })); // Send confirmation to the sender
         } else {
-          console.log(`Usuário ${recipientUsername} não está disponível ou offline`);
+          console.log(`User ${recipientUsername} is unavailable or offline`);
         }
       }
     }
 
-    // Notificar que o usuário está digitando
+    // Notify that the user is typing
     else if (data.type === 'typing') {
       if (ws.username) {
         wss.clients.forEach((client) => {
@@ -123,51 +129,51 @@ wss.on('connection', (ws) => {
           }
         });
       } else {
-        console.log('Erro: Tentativa de notificar digitação sem nome de usuário definido');
+        console.log('Error: Attempt to notify typing without a username set');
       }
     }
 
-    // Alterar status do usuário (online, ausente, ocupado)
+    // Change user status (online, away, busy)
     else if (data.type === 'change_status') {
       if (!ws.username) {
-        console.log('Erro: Nome de usuário não definido ao tentar mudar o status');
+        console.log('Error: Username not defined when trying to change status');
         return;
       }
 
       const validStatuses = ['online', 'away', 'busy'];
       if (validStatuses.includes(data.status)) {
-        ws.status = data.status; // Atualizar o status do WebSocket do usuário
-        console.log(`${ws.username} mudou status para ${ws.status}`);
+        ws.status = data.status; // Update the WebSocket user's status
+        console.log(`${ws.username} changed status to ${ws.status}`);
 
-        // Atualizar o status do usuário no banco de dados
+        // Update the user's status in the database
         let user = await User.findOne({ username: ws.username });
         if (user) {
           user.status = ws.status;
           await user.save();
         }
 
-        // Enviar a lista atualizada de usuários a todos os clientes
+        // Broadcast updated user list to all clients
         broadcastUserList();
       } else {
-        console.log(`Status inválido: ${data.status}`);
+        console.log(`Invalid status: ${data.status}`);
       }
     }
   });
 
   ws.on('close', async () => {
-    // Verificar se o usuário existe antes de deletar
+    // Ensure the user exists before deleting
     if (ws.username) {
       clients.delete(ws.username);
-      console.log(`Cliente ${ws.username} desconectado`);
+      console.log(`Client ${ws.username} disconnected`);
 
-      // Atualizar status do usuário para offline no banco de dados
+      // Update the user's status to offline in the database
       let user = await User.findOne({ username: ws.username });
       if (user) {
         user.status = 'offline';
         await user.save();
       }
 
-      // Atualizar a lista de usuários quando alguém sair
+      // Broadcast the updated user list when someone leaves
       broadcastUserList();
     }
   });
@@ -175,5 +181,5 @@ wss.on('connection', (ws) => {
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-  console.log(`Servidor está ouvindo na porta ${PORT}`);
+  console.log(`Server is listening on port ${PORT}`);
 });
