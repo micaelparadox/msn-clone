@@ -5,12 +5,13 @@ const mongoose = require('mongoose');
 require('dotenv').config(); // Load environment variables
 
 // Connect to MongoDB using the connection string from the environment
-mongoose.connect(process.env.MONGO_URL, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-  .then(() => console.log('Connected to MongoDB'))
-  .catch((error) => console.log('MongoDB connection error:', error));
+mongoose.connect(process.env.MONGO_URL)
+  .then(() => {
+    console.log('Connected to MongoDB');
+  })
+  .catch((err) => {
+    console.error('Error connecting to MongoDB:', err);
+  });
 
 // Define schemas
 const UserSchema = new mongoose.Schema({
