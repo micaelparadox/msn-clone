@@ -1,222 +1,239 @@
-/* Estilo geral */
 body {
-    background: #f0f0f0;
-    color: #000000;
-    margin: 0;
-    padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+  background: #f0f0f0;
+  color: #000000;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+#login-container {
+  background: #ffffff;
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  width: 350px;
+  text-align: center;
+  animation: fadeIn 0.8s ease-in-out;
+}
+
+#login-container h2 {
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: #333;
+}
+
+#nickname-input {
+  width: 80%;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  margin-bottom: 20px;
+}
+
+#login-btn {
+  padding: 10px 20px;
+  background-color: #0078d7;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+#login-btn:hover {
+  background-color: #005bb5;
+}
+
+/* Informações do criador */
+footer#creator-info {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #666;
+}
+
+footer#creator-info a {
+  color: #0078d7;
+  text-decoration: none;
+}
+
+footer#creator-info a:hover {
+  text-decoration: underline;
+}
+
+/* Estilo do container do chat */
+#chat-container {
+  display: none;
+  flex: 1;
+  width: 100vw;
+  height: 100vh;
+  background: #ffffff;
+  padding: 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+}
+
+#chat-container.active {
+  display: flex;
+}
+
+#user-list {
+  width: 300px;
+  background-color: #f8f8f8;
+  height: calc(100vh - 40px);
+  overflow-y: auto;
+  padding: 15px;
+  border-right: 1px solid #ccc;
+}
+
+#chat-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 40px);
+}
+
+#messages {
+  flex: 1;
+  padding: 10px;
+  overflow-y: scroll;
+  background-color: #fff;
+  border-bottom: 1px solid #ccc;
+}
+
+#typing {
+  font-style: italic;
+  color: #888888;
+  padding: 5px 10px;
+}
+
+#message-input {
+  width: 100%;
+  padding: 10px;
+  background-color: #f8f8f8;
+  border: 1px solid #ccc;
+  color: #000000;
+  font-size: 16px;
+  border-radius: 4px;
+}
+
+#send-button {
+  padding: 10px 20px;
+  background-color: #0078d7;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  margin-left: 10px;
+  border-radius: 4px;
+}
+
+#send-button:hover {
+  background-color: #005bb5;
+}
+
+/* Estilos para status e mensagens */
+.user-item {
+  cursor: pointer;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #ccc;
+}
+
+.message {
+  margin-bottom: 15px;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 16px;
+  background-color: #f8f8f8;
+}
+
+.message.user {
+  background-color: #e1f5fe;
+}
+
+.message.other {
+  background-color: #f1f1f1;
+}
+
+/* Toolbar e dropdown de status */
+#toolbar {
+  background-color: #f8f8f8;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#toolbar button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 10px;
+  color: #0078d7;
+}
+
+#toolbar button:hover {
+  background-color: #e1e1e1;
+}
+
+.status-dropdown {
+  margin-left: auto;
+  background-color: #fff;
+  color: #000;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+.status-icon {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 5px;
+  display: inline-block;
+}
+
+.status-online {
+  background-color: #44b700;
+}
+
+.status-away {
+  background-color: #ffa500;
+}
+
+.status-busy {
+  background-color: #ff0000;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
   }
-  
-  /* Estilo do container de login */
-  #login-container {
-    background: #ffffff;
-    padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-    width: 350px;
-    text-align: center;
-    animation: fadeIn 0.8s ease-in-out;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  
-  #login-container h2 {
-    margin-bottom: 20px;
-    font-size: 24px;
-    color: #333;
-  }
-  
-  #nickname-input {
-    width: 80%;
-    padding: 10px;
-    font-size: 16px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    margin-bottom: 20px;
-  }
-  
-  #login-btn {
-    padding: 10px 20px;
-    background-color: #0078d7;
-    color: white;
-    border: none;
-    cursor: pointer;
-    border-radius: 8px;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
-  }
-  
-  #login-btn:hover {
-    background-color: #005bb5;
-  }
-  
-  /* Estilo do container do chat */
-  #chat-container {
-    display: none;
-    max-width: 800px;
-    margin: 50px auto;
-    background: #ffffff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-  }
-  
-  #chat-container.active {
-    display: block;
-  }
-  
+}
+
+@media (max-width: 768px) {
   #user-list {
-    width: 200px;
-    background-color: #f8f8f8;
-    height: 500px;
-    overflow-y: auto;
-    padding: 15px;
-    border-right: 1px solid #ccc;
+    width: 100%;
+    height: auto;
+    border-right: none;
   }
-  
-  #chat-area {
-    flex: 1;
-    display: flex;
+
+  #chat-container {
     flex-direction: column;
   }
-  
-  #messages {
-    flex: 1;
-    padding: 10px;
-    overflow-y: scroll;
-    background-color: #fff;
-    border-bottom: 1px solid #ccc;
-  }
-  
-  #typing {
-    font-style: italic;
-    color: #888888;
-    padding: 5px 10px;
-  }
-  
-  #message-input {
-    width: 100%;
-    padding: 10px;
-    background-color: #f8f8f8;
-    border: 1px solid #ccc;
-    color: #000000;
-    font-size: 16px;
-    border-radius: 4px;
-  }
-  
-  #send-button {
-    padding: 10px 20px;
-    background-color: #0078d7;
-    color: white;
-    border: none;
-    cursor: pointer;
-    font-size: 16px;
-    margin-left: 10px;
-    border-radius: 4px;
-  }
-  
-  #send-button:hover {
-    background-color: #005bb5;
-  }
-  
-  /* Estilos para status e mensagens */
-  .user-item {
-    cursor: pointer;
-    padding: 10px;
-    display: flex;
-    align-items: center;
-    border-bottom: 1px solid #ccc;
-  }
-  
-  .message {
-    margin-bottom: 15px;
-    padding: 10px;
-    border-radius: 8px;
-    font-size: 16px;
-    background-color: #f8f8f8;
-  }
-  
-  .message.user {
-    background-color: #e1f5fe;
-  }
-  
-  .message.other {
-    background-color: #f1f1f1;
-  }
-  
-  /* Toolbar e dropdown de status */
-  #toolbar {
-    background-color: #f8f8f8;
-    padding: 10px;
-    border-bottom: 1px solid #ccc;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  #toolbar button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 10px;
-    color: #0078d7;
-  }
-  
-  #toolbar button:hover {
-    background-color: #e1e1e1;
-  }
-  
-  .status-dropdown {
-    margin-left: auto;
-    background-color: #fff;
-    color: #000;
-    border: 1px solid #ccc;
-    padding: 10px;
-    border-radius: 4px;
-  }
-  
-  .status-icon {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    margin-right: 5px;
-    display: inline-block;
-  }
-  
-  .status-online {
-    background-color: #44b700;
-  }
-  
-  .status-away {
-    background-color: #ffa500;
-  }
-  
-  .status-busy {
-    background-color: #ff0000;
-  }
-  
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(-20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  @media (max-width: 768px) {
-    #user-list {
-      width: 100%;
-      height: auto;
-      border-right: none;
-    }
-  
-    #chat-container {
-      flex-direction: column;
-    }
-  }
-  
+}

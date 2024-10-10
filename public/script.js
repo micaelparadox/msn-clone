@@ -22,8 +22,11 @@ loginBtn.addEventListener('click', () => {
     return;
   }
   username = username.toLowerCase();
-  loginContainer.classList.remove('active');
+  
+  // Esconder a tela de login e mostrar o chat
+  loginContainer.style.display = 'none';
   chatContainer.classList.add('active');
+  
   connectWebSocket();
 });
 
