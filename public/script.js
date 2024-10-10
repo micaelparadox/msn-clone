@@ -8,6 +8,7 @@ const messageInput = document.getElementById('message-input');
 const typingDiv = document.getElementById('typing');
 const usersList = document.getElementById('users');
 const sendButton = document.getElementById('send-button');
+const onlineCounter = document.getElementById('online-counter'); // Contador de contatos online
 let typingTimeout;
 const chatWindows = {};
 
@@ -94,11 +95,17 @@ function displayMessage(data) {
 
 function updateUsersList(users) {
   usersList.innerHTML = '';
+  let onlineCount = 0; // Contador de usuários online
   users.forEach((user) => {
     const userItem = document.createElement('li');
     userItem.className = 'user-item';
     userItem.dataset.username = user.username;
     const statusClass = user.status === 'online' ? 'status-online' : user.status === 'away' ? 'status-away' : 'status-busy';
+
+    // Incrementa o contador apenas para status "online"
+    if (user.status === 'online') {
+      onlineCount++;
+    }
 
     userItem.innerHTML = `<span class="status-icon ${statusClass}"></span><img src="https://api.dicebear.com/9.x/bottts/svg?seed=${user.username}" alt="User Icon" width="40" height="40"> ${user.username}`;
     userItem.addEventListener('click', () => {
@@ -106,6 +113,9 @@ function updateUsersList(users) {
     });
     usersList.appendChild(userItem);
   });
+
+  // Atualiza o contador de usuários online
+  onlineCounter.textContent = onlineCount;
 }
 
 function changeUserStatus(status) {

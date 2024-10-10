@@ -1,24 +1,68 @@
+/* Estilo geral */
 body {
     background: #f0f0f0;
     color: #000000;
     margin: 0;
     padding: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
   }
   
-  #login-container,
+  /* Estilo do container de login */
+  #login-container {
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    width: 350px;
+    text-align: center;
+    animation: fadeIn 0.8s ease-in-out;
+  }
+  
+  #login-container h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+  }
+  
+  #nickname-input {
+    width: 80%;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    margin-bottom: 20px;
+  }
+  
+  #login-btn {
+    padding: 10px 20px;
+    background-color: #0078d7;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+  }
+  
+  #login-btn:hover {
+    background-color: #005bb5;
+  }
+  
+  /* Estilo do container do chat */
   #chat-container {
+    display: none;
     max-width: 800px;
     margin: 50px auto;
-    background: #FFFFFF;
+    background: #ffffff;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-    display: none;
-    color: #000000;
   }
   
-  #login-container.active,
   #chat-container.active {
     display: block;
   }
@@ -77,6 +121,7 @@ body {
     background-color: #005bb5;
   }
   
+  /* Estilos para status e mensagens */
   .user-item {
     cursor: pointer;
     padding: 10px;
@@ -101,6 +146,7 @@ body {
     background-color: #f1f1f1;
   }
   
+  /* Toolbar e dropdown de status */
   #toolbar {
     background-color: #f8f8f8;
     padding: 10px;
@@ -120,12 +166,6 @@ body {
   
   #toolbar button:hover {
     background-color: #e1e1e1;
-  }
-  
-  .chat-input {
-    display: flex;
-    align-items: center;
-    margin-top: 10px;
   }
   
   .status-dropdown {
@@ -155,6 +195,17 @@ body {
   
   .status-busy {
     background-color: #ff0000;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
   
   @media (max-width: 768px) {
