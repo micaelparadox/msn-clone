@@ -10,7 +10,8 @@ const usersList = document.getElementById('users');
 const sendButton = document.getElementById('send-button');
 const onlineCounter = document.getElementById('online-counter'); // Contador de contatos online
 let typingTimeout;
-const chatWindows = {};
+let typing = false; // Flag para evitar envio de várias notificações "digitando"
+let typingTimeoutDuration = 3000; // Duração de 3 segundos sem digitar para remover a mensagem de digitação
 
 let username;
 let reconnectTimeout;
@@ -63,7 +64,7 @@ function connectWebSocket() {
         clearTimeout(typingTimeout);
         typingTimeout = setTimeout(() => {
           typingDiv.textContent = '';
-        }, 3000);
+        }, typingTimeoutDuration);
       }
     }
   };
@@ -144,8 +145,18 @@ function sendMessage() {
 }
 
 messageInput.addEventListener('keypress', (event) => {
+  if (!typing) {
+    typing = true;
+    ws.send(JSON.stringify({ type: 'typing', user: username }));
+  }
+  clearTimeout(typingTimeout);
+  typingTimeout = setTimeout(() => {
+    typing = false;
+  }, typingTimeoutDuration);
+
   if (event.key === 'Enter') {
     sendMessage();
+    typing = false; // Reset ao enviar a mensagem
   }
 });
 
