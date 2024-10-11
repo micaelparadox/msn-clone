@@ -4,10 +4,10 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
 }
 
 #login-container {
@@ -68,7 +68,7 @@ footer#creator-info a:hover {
 
 /* Estilo do container do chat */
 #chat-container {
-  display: none;
+  display: none; /* Escondido por padrão */
   flex: 1;
   width: 100vw;
   height: 100vh;
@@ -81,7 +81,7 @@ footer#creator-info a:hover {
 }
 
 #chat-container.active {
-  display: flex;
+  display: flex; /* Mostra o chat após o login */
 }
 
 #user-list {
@@ -215,6 +215,7 @@ footer#creator-info a:hover {
   background-color: #ff0000;
 }
 
+/* Fade-in animation for login screen */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -235,5 +236,9 @@ footer#creator-info a:hover {
 
   #chat-container {
     flex-direction: column;
+  }
+
+  #chat-area {
+    margin-top: 20px;
   }
 }

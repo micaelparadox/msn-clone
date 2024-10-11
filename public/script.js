@@ -25,7 +25,7 @@ loginBtn.addEventListener('click', () => {
   
   // Esconder a tela de login e mostrar o chat
   loginContainer.style.display = 'none';
-  chatContainer.classList.add('active');
+  chatContainer.style.display = 'flex'; // Exibe o chat
   
   connectWebSocket();
 });

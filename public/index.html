@@ -12,7 +12,7 @@
 <body>
 
   <!-- Login Screen -->
-  <div id="login-container" class="active">
+  <div id="login-container">
     <h2>Bem-vindo ao MSN Chat</h2>
     <input type="text" id="nickname-input" placeholder="Digite seu nickname" />
     <button id="login-btn">Entrar</button>
@@ -25,8 +25,8 @@
     </footer>
   </div>
 
-  <!-- Chat Container -->
-  <div id="chat-container">
+  <!-- Chat Container (oculto por padrão) -->
+  <div id="chat-container" style="display: none;">
     <div id="user-list">
       <h4>Contatos (<span id="online-counter">0</span> online)</h4>
       <ul id="users"></ul>
