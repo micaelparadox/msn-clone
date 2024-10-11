@@ -124,7 +124,10 @@ function updateUsersList(users) {
       onlineCount++;
     }
 
-    userItem.innerHTML = `<span class="status-icon ${statusClass}"></span><img src="https://api.dicebear.com/9.x/bottts/svg?seed=${user.username}" alt="User Icon" width="40" height="40"> ${user.username}`;
+    // Corrigido o problema com a exibição do avatar:
+    const avatarUrl = `https://api.dicebear.com/9.x/bottts/svg?seed=${encodeURIComponent(user.username)}`;
+
+    userItem.innerHTML = `<span class="status-icon ${statusClass}"></span><img src="${avatarUrl}" alt="User Icon" width="40" height="40"> ${user.username}`;
     userItem.addEventListener('click', () => {
       openChatWindow(user.username);
     });
