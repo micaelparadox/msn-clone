@@ -227,18 +227,41 @@ footer#creator-info a:hover {
   }
 }
 
+/* Ajustes específicos para telas menores */
 @media (max-width: 768px) {
-  #user-list {
-    width: 100%;
-    height: auto;
-    border-right: none;
+  body {
+    display: block;
   }
 
   #chat-container {
     flex-direction: column;
+    width: 100%;
+  }
+
+  #user-list {
+    width: 100%;
+    border-right: none;
+    height: auto;
+    padding: 10px;
   }
 
   #chat-area {
-    margin-top: 20px;
+    width: 100%;
+    height: auto;
+    margin-top: 10px;
+  }
+
+  #messages {
+    height: 300px; /* Definir uma altura específica para o chat em mobile */
+  }
+
+  .chat-input {
+    flex-direction: column;
+  }
+
+  #send-button {
+    width: 100%;
+    margin-top: 10px;
+    margin-left: 0;
   }
 }
