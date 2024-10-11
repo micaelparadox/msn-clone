@@ -17,7 +17,7 @@ let typingTimeoutDuration = 3000; // Duração de 3 segundos sem digitar para re
 let username;
 let reconnectTimeout;
 
-// Mapping of currently open private chats
+// Mapeamento de chats privados abertos
 const privateChats = {};
 
 loginBtn.addEventListener('click', () => {
@@ -27,7 +27,7 @@ loginBtn.addEventListener('click', () => {
     return;
   }
 
-  // Validate username: alphanumeric and 3-20 characters
+  // Validar username: alfanumérico e entre 3-20 caracteres
   const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
   if (!usernameRegex.test(username)) {
     alert('Nome de usuário inválido! Deve ter 3-20 caracteres alfanuméricos.');
@@ -74,6 +74,9 @@ function connectWebSocket() {
       if (message.data.user !== username) {
         displayTypingIndicator(message.data.user, message.data.recipient);
       }
+    } else if (message.type === 'private_messages') {
+      const targetUsername = message.recipient;
+      displayPrivateMessages(message.data, targetUsername);
     } else if (message.type === 'error') {
       alert(`Erro: ${message.message}`);
     }
@@ -90,12 +93,11 @@ function connectWebSocket() {
   };
 }
 
-// Função para exibir mensagens, incluindo suporte a links e GIFs
+// Função para exibir mensagens públicas, incluindo suporte a links e GIFs
 function displayMessage(data) {
   const messageElem = document.createElement('div');
   messageElem.classList.add('message');
 
-  // Detecta URLs e transforma em hyperlinks clicáveis
   const urlRegex = /(https?:\/\/[^\s]+)/g;
   let messageText = data.text.replace(urlRegex, function (url) {
     if (url.endsWith('.gif')) {
@@ -134,17 +136,16 @@ function updateUsersList(users) {
 
     const avatarUrl = `https://api.dicebear.com/9.x/bottts/svg?seed=${encodeURIComponent(user.username)}`;
 
-    // Badge de mensagens não lidas
     const unreadBadge = document.createElement('span');
     unreadBadge.className = 'unread-badge';
-    unreadBadge.dataset.username = user.username; // Para identificar pelo nome
-    unreadBadge.textContent = '0'; // Começa com 0 mensagens não lidas
+    unreadBadge.dataset.username = user.username;
+    unreadBadge.textContent = '0';
     userItem.appendChild(unreadBadge);
 
     userItem.innerHTML += `<span class="status-icon ${statusClass}"></span><img src="${avatarUrl}" alt="User Icon" width="40" height="40"> ${user.username}`;
     userItem.addEventListener('click', () => {
       openPrivateChat(user.username);
-      resetUnreadMessages(user.username); // Resetar contador ao abrir chat
+      resetUnreadMessages(user.username);
     });
     usersList.appendChild(userItem);
   });
@@ -154,7 +155,6 @@ function updateUsersList(users) {
 
 function displayTypingIndicator(user, recipient) {
   if (recipient && privateChats[recipient]) {
-    // Typing in a private chat
     const privateChat = privateChats[recipient];
     const typingIndicator = privateChat.container.querySelector('.typing-indicator');
     if (typingIndicator) {
@@ -167,13 +167,11 @@ function displayTypingIndicator(user, recipient) {
       privateChat.container.insertBefore(newTypingIndicator, privateChat.container.querySelector('.chat-input'));
     }
 
-    // Remove typing indicator after timeout
     privateChats[recipient].typingTimeout = setTimeout(() => {
       const typingIndicator = privateChat.container.querySelector('.typing-indicator');
       if (typingIndicator) typingIndicator.remove();
     }, typingTimeoutDuration);
   } else {
-    // Typing in public chat
     typingDiv.textContent = `${user} está digitando...`;
     clearTimeout(typingTimeout);
     typingTimeout = setTimeout(() => {
@@ -187,7 +185,7 @@ function incrementUnreadMessages(username) {
   if (unreadBadge) {
     let unreadCount = parseInt(unreadBadge.textContent);
     unreadBadge.textContent = unreadCount + 1;
-    unreadBadge.style.display = 'block'; // Exibe o contador
+    unreadBadge.style.display = 'block';
   }
 }
 
@@ -195,9 +193,14 @@ function resetUnreadMessages(username) {
   const unreadBadge = document.querySelector(`.unread-badge[data-username="${username}"]`);
   if (unreadBadge) {
     unreadBadge.textContent = '0';
-    unreadBadge.style.display = 'none'; // Oculta o contador
+    unreadBadge.style.display = 'none';
   }
 }
+
+statusDropdown.addEventListener('change', (event) => {
+  const selectedStatus = event.target.value;
+  changeUserStatus(selectedStatus);
+});
 
 function changeUserStatus(status) {
   if (username) {
@@ -208,10 +211,8 @@ function changeUserStatus(status) {
 
 function openPrivateChat(targetUsername) {
   if (privateChats[targetUsername]) {
-    // If chat already exists, focus on it
     privateChats[targetUsername].container.style.display = 'flex';
   } else {
-    // Create a new private chat
     const privateChatContainer = document.createElement('div');
     privateChatContainer.classList.add('card', 'private-chat-container');
     privateChatContainer.style.display = 'flex';
@@ -231,26 +232,25 @@ function openPrivateChat(targetUsername) {
 
     chatContainer.appendChild(privateChatContainer);
 
-    // Event listener to close the private chat
     const closeBtn = privateChatContainer.querySelector('.close-private-chat');
     closeBtn.addEventListener('click', () => {
       privateChatContainer.style.display = 'none';
     });
 
-    // Event listener to send private messages
     const privateSendButton = privateChatContainer.querySelector('.private-send-button');
     privateSendButton.addEventListener('click', () => {
       const recipient = privateSendButton.getAttribute('data-recipient');
       sendPrivateMessage(recipient);
     });
 
-    // Store the private chat in the mapping
     privateChats[targetUsername] = {
       container: privateChatContainer,
       messagesDiv: privateChatContainer.querySelector(`#private-messages-${targetUsername}`),
       input: privateChatContainer.querySelector(`#private-message-input-${targetUsername}`),
       typingTimeout: null
     };
+
+    ws.send(JSON.stringify({ type: 'load_private_messages', recipient: targetUsername }));
   }
 }
 
@@ -274,38 +274,43 @@ function sendPrivateMessage(targetUsername) {
     text: messageText,
   };
 
-  ws.send(JSON.stringify(message)); // Envia via WebSocket
-  messageInput.value = ''; // Limpa o campo de entrada
+  ws.send(JSON.stringify(message));
+  messageInput.value = '';
 
-  // Display the sent message immediately
   displayPrivateMessage(username, messageText, targetUsername);
 }
 
 function receivePrivateMessage(user, text, recipient) {
-  // recipient is who the message is intended for
-  // if recipient is username, it means it's a private message to me
-  const chatWithUser = user; // The sender
+  const chatWithUser = user;
 
   if (privateChats[chatWithUser] && privateChats[chatWithUser].container.style.display !== 'none') {
-    // If private chat with sender is open, display the message
     displayPrivateMessage(user, text, chatWithUser);
   } else {
-    // If private chat is not open, increment the unread badge
     incrementUnreadMessages(user);
   }
 }
 
-function displayPrivateMessage(user, text, targetUsername) {
+function displayPrivateMessages(messages, targetUsername) {
   const privateChat = privateChats[targetUsername];
   if (!privateChat) {
-    // Chat not open, do not display
+    return;
+  }
+
+  messages.forEach(msg => {
+    const { user, text, timestamp } = msg;
+    displayPrivateMessage(user, text, targetUsername, new Date(timestamp));
+  });
+}
+
+function displayPrivateMessage(user, text, targetUsername, timestamp = new Date()) {
+  const privateChat = privateChats[targetUsername];
+  if (!privateChat) {
     return;
   }
 
   const messageElem = document.createElement('div');
   messageElem.classList.add('message', user === username ? 'user' : 'other');
 
-  // Detecta URLs e transforma em hyperlinks clicáveis
   const urlRegex = /(https?:\/\/[^\s]+)/g;
   let messageText = text.replace(urlRegex, function (url) {
     if (url.endsWith('.gif')) {
@@ -315,31 +320,35 @@ function displayPrivateMessage(user, text, targetUsername) {
     }
   });
 
-  const time = new Date().toLocaleString('pt-BR');
+  const time = timestamp.toLocaleString('pt-BR');
   messageElem.innerHTML = `<strong>${user}</strong> <small>(${time})</small>: ${messageText}`;
   privateChat.messagesDiv.appendChild(messageElem);
   privateChat.messagesDiv.scrollTop = privateChat.messagesDiv.scrollHeight;
 }
 
-// Handle typing indicator for private chats
+// Manipular indicador de digitação para chats privados
 function handlePrivateTyping(recipient) {
   const privateChat = privateChats[recipient];
   if (privateChat && privateChat.container.style.display !== 'none') {
-    // Show typing indicator in the private chat
-    privateChat.container.querySelector('.typing-indicator')?.remove(); // Remove existing
-    const typingIndicator = document.createElement('div');
-    typingIndicator.classList.add('typing-indicator');
-    typingIndicator.textContent = `${recipient} está digitando...`;
-    privateChat.container.insertBefore(typingIndicator, privateChat.container.querySelector('.chat-input'));
+    const existingIndicator = privateChat.container.querySelector('.typing-indicator');
+    if (existingIndicator) {
+      existingIndicator.textContent = `${recipient} está digitando...`;
+      clearTimeout(privateChat.typingTimeout);
+    } else {
+      const typingIndicator = document.createElement('div');
+      typingIndicator.classList.add('typing-indicator');
+      typingIndicator.textContent = `${recipient} está digitando...`;
+      privateChat.container.insertBefore(typingIndicator, privateChat.container.querySelector('.chat-input'));
+    }
 
-    clearTimeout(privateChat.typingTimeout);
-    privateChat.typingTimeout = setTimeout(() => {
-      typingIndicator.remove();
+    privateChats[recipient].typingTimeout = setTimeout(() => {
+      const typingIndicator = privateChat.container.querySelector('.typing-indicator');
+      if (typingIndicator) typingIndicator.remove();
     }, typingTimeoutDuration);
   }
 }
 
-// Event listeners for typing in private chats
+// Configurar listeners de digitação para chats privados
 function setupPrivateChatTypingListener(targetUsername) {
   const privateChat = privateChats[targetUsername];
   if (privateChat) {
@@ -361,6 +370,24 @@ function setupPrivateChatTypingListener(targetUsername) {
   }
 }
 
+// Exibir indicador de digitação para chats públicos
+messageInput.addEventListener('keypress', (event) => {
+  if (!typing) {
+    typing = true;
+    ws.send(JSON.stringify({ type: 'typing', user: username }));
+  }
+  clearTimeout(typingTimeout);
+  typingTimeout = setTimeout(() => {
+    typing = false;
+  }, typingTimeoutDuration);
+
+  if (event.key === 'Enter') {
+    sendMessage();
+    typing = false;
+  }
+});
+
+// Enviar mensagem pública
 sendButton.addEventListener('click', () => {
   sendMessage();
 });
@@ -376,7 +403,7 @@ function sendMessage() {
   }
 }
 
-// Observe new private chats and setup typing listeners
+// Observador para novos chats privados e configuração de listeners
 const observer = new MutationObserver((mutationsList) => {
   for (const mutation of mutationsList) {
     if (mutation.type === 'childList') {
@@ -392,3 +419,24 @@ const observer = new MutationObserver((mutationsList) => {
 });
 
 observer.observe(chatContainer, { childList: true });
+
+// Receber histórico de mensagens privadas do servidor
+ws.onmessage = (event) => {
+  const message = JSON.parse(event.data);
+  if (message.type === 'message') {
+    displayMessage(message.data);
+  } else if (message.type === 'users') {
+    updateUsersList(message.data);
+  } else if (message.type === 'private_message') {
+    receivePrivateMessage(message.data.user, message.data.text, message.data.recipient);
+  } else if (message.type === 'typing') {
+    if (message.data.user !== username) {
+      displayTypingIndicator(message.data.user, message.data.recipient);
+    }
+  } else if (message.type === 'private_messages') {
+    const targetUsername = message.recipient;
+    displayPrivateMessages(message.data, targetUsername);
+  } else if (message.type === 'error') {
+    alert(`Erro: ${message.message}`);
+  }
+};

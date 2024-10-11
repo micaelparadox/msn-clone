@@ -203,7 +203,7 @@ body {
 .user-item {
   display: flex;
   align-items: center;
-  padding: 10px;
+  padding: 12px;
   border-bottom: 1px solid var(--border-color);
   cursor: pointer;
   position: relative;
@@ -214,8 +214,8 @@ body {
 }
 
 .status-icon {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   margin-right: 10px;
 }
@@ -247,18 +247,20 @@ body {
 
 .message {
   margin-bottom: 15px;
-  padding: 10px;
+  padding: 15px;
   border-radius: 8px;
   max-width: 80%;
+  font-size: 16px;
+  line-height: 1.5;
 }
 
 .message.user {
-  background-color: #e1f5fe;
+  background-color: #d1e7ff;
   align-self: flex-end;
 }
 
 .message.other {
-  background-color: #f1f1f1;
+  background-color: #f0f0f0;
   align-self: flex-start;
 }
 
@@ -266,7 +268,7 @@ body {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  width: 300px;
+  width: 350px;
   max-height: 80%;
   display: none; /* Escondido por padrão */
   flex-direction: column;
@@ -281,9 +283,17 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 5px 10px;
+  padding: 10px;
   border-bottom: 1px solid var(--border-color);
   background-color: var(--card-background);
+  font-size: 18px;
+}
+
+.private-chat-header button.close-private-chat {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
 }
 
 .private-messages {
@@ -306,13 +316,6 @@ body {
 
 .private-messages .message.other {
   align-self: flex-start;
-}
-
-.private-chat-header button.close-private-chat {
-  background: none;
-  border: none;
-  font-size: 16px;
-  cursor: pointer;
 }
 
 .private-send-button {
@@ -355,7 +358,7 @@ body {
   padding: 5px 10px;
 }
 
-/* Estilos para os Typing Indicators */
+/* Estilos para os Indicadores de Digitação */
 .typing-indicator {
   font-style: italic;
   color: #888;
@@ -391,6 +394,7 @@ body {
 
   #chat-area {
     flex: 1;
+    padding: 20px;
   }
 }
 
