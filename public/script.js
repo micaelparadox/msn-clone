@@ -80,9 +80,22 @@ function connectWebSocket() {
   };
 }
 
+// Função para exibir mensagens, incluindo suporte a links e GIFs
 function displayMessage(data) {
   const messageElem = document.createElement('div');
   messageElem.classList.add('message');
+
+  // Detecta URLs e transforma em hyperlinks clicáveis
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  let messageText = data.text.replace(urlRegex, function(url) {
+    // Verifica se o link termina com .gif
+    if (url.endsWith('.gif')) {
+      return `<img src="${url}" alt="GIF" style="max-width: 200px; max-height: 200px;" />`;
+    } else {
+      return `<a href="${url}" target="_blank">${url}</a>`;
+    }
+  });
+
   if (data.user === username) {
     messageElem.classList.add('user');
     messageElem.style.textAlign = 'right';
@@ -92,7 +105,7 @@ function displayMessage(data) {
   }
 
   const time = new Date(data.timestamp).toLocaleString('pt-BR');
-  messageElem.innerHTML = `<strong>${data.user}</strong> <small>(${time})</small>: ${data.text}`;
+  messageElem.innerHTML = `<strong>${data.user}</strong> <small>(${time})</small>: ${messageText}`;
   messagesDiv.appendChild(messageElem);
   messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
