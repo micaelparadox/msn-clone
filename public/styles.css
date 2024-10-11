@@ -252,3 +252,41 @@ footer#creator-info a:hover {
     height: 30px;
   }
 }
+
+@media (max-width: 1024px) {
+  /* Ajustes para iPhone 13 e dispositivos maiores */
+  #chat-container {
+    padding: 10px;
+  }
+
+  #user-list {
+    width: 100%;
+    height: auto;
+    border-right: none;
+    padding: 10px;
+  }
+
+  #chat-area {
+    margin-top: 10px;
+    padding: 10px;
+  }
+
+  #send-button {
+    font-size: 14px;
+    padding: 8px 16px;
+  }
+
+  #message-input {
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  .user-item img {
+    width: 25px;
+    height: 25px;
+  }
+
+  .status-dropdown {
+    padding: 8px;
+  }
+}
