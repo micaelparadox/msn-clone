@@ -176,13 +176,28 @@ body {
   border-top: 1px solid var(--border-color);
 }
 
-#message-input {
+.chat-input input[type="text"] {
   flex: 1;
   padding: 10px;
   font-size: 16px;
   border: 1px solid var(--border-color);
   border-radius: 5px;
   margin-right: 10px;
+}
+
+.btn-primary {
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--secondary-color);
 }
 
 .user-item {
@@ -203,6 +218,18 @@ body {
   height: 10px;
   border-radius: 50%;
   margin-right: 10px;
+}
+
+.status-online {
+  background-color: green;
+}
+
+.status-away {
+  background-color: yellow;
+}
+
+.status-busy {
+  background-color: red;
 }
 
 .unread-badge {
@@ -233,6 +260,106 @@ body {
 .message.other {
   background-color: #f1f1f1;
   align-self: flex-start;
+}
+
+.private-chat-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 300px;
+  max-height: 80%;
+  display: none; /* Escondido por padrão */
+  flex-direction: column;
+  z-index: 1000;
+  background-color: var(--card-background);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+.private-chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 10px;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--card-background);
+}
+
+.private-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.private-messages .message {
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #f1f1f1;
+}
+
+.private-messages .message.user {
+  background-color: #e1f5fe;
+  align-self: flex-end;
+}
+
+.private-messages .message.other {
+  align-self: flex-start;
+}
+
+.private-chat-header button.close-private-chat {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.private-send-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.private-send-button:hover {
+  background-color: var(--secondary-color);
+}
+
+.private-chat-container .chat-input {
+  display: flex;
+  padding: 10px;
+  background-color: #f8f8f8;
+  border-top: 1px solid var(--border-color);
+}
+
+.private-chat-container .chat-input input[type="text"] {
+  flex: 1;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  margin-right: 10px;
+}
+
+.private-chat-container .chat-input button {
+  padding: 10px 20px;
+}
+
+.private-chat-container .typing-indicator {
+  font-style: italic;
+  color: #888;
+  padding: 5px 10px;
+}
+
+/* Estilos para os Typing Indicators */
+.typing-indicator {
+  font-style: italic;
+  color: #888;
+  padding: 5px 10px;
 }
 
 @keyframes fadeIn {
@@ -293,6 +420,13 @@ body {
   #send-button {
     width: 100%;
   }
+
+  .private-chat-container {
+    width: 100%;
+    max-height: 50%;
+    bottom: 0;
+    right: 0;
+  }
 }
 
 @media (min-width: 1920px) {
@@ -303,64 +437,4 @@ body {
   #user-list {
     width: 400px;
   }
-}
-
-/* Estilos para o chat privado */
-#private-chat-container {
-  display: none; /* Inicialmente escondido */
-  flex-direction: column;
-  height: 100%;
-  border: 1px solid var(--border-color);
-  padding: 10px;
-  margin-top: 20px;
-  background-color: var(--card-background);
-}
-
-
-.private-chat-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 5px 10px;
-  border-bottom: 1px solid var(--border-color);
-  background-color: var(--card-background);
-}
-
-.private-messages {
-  flex: 1;
-  overflow-y: auto;
-  padding: 10px;
-}
-
-.private-messages .message {
-  margin-bottom: 10px;
-  padding: 10px;
-  border-radius: 5px;
-  background-color: #f1f1f1;
-}
-
-.private-messages .message.user {
-  background-color: #e1f5fe;
-  align-self: flex-end;
-}
-
-.private-messages .message.other {
-  align-self: flex-start;
-}
-
-.private-chat .chat-input {
-  display: flex;
-  margin-top: 10px;
-}
-
-.private-chat .chat-input input {
-  flex: 1;
-  padding: 10px;
-  border-radius: 5px;
-  border: 1px solid var(--border-color);
-  margin-right: 10px;
-}
-
-.private-chat .chat-input button {
-  padding: 10px 20px;
 }
