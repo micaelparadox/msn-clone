@@ -98,14 +98,17 @@ footer#creator-info a:hover {
   display: flex;
   flex-direction: column;
   height: calc(100vh - 40px);
+  overflow: hidden;
 }
 
+/* Barra de scroll nas mensagens */
 #messages {
   flex: 1;
   padding: 10px;
-  overflow-y: scroll;
+  overflow-y: auto;
   background-color: #fff;
   border-bottom: 1px solid #ccc;
+  scroll-behavior: smooth; /* Adiciona animação ao scroll */
 }
 
 #typing {
@@ -154,6 +157,7 @@ footer#creator-info a:hover {
   border-radius: 8px;
   font-size: 16px;
   background-color: #f8f8f8;
+  word-wrap: break-word; /* Garante que as palavras longas se quebrem */
 }
 
 .message.user {
@@ -215,7 +219,7 @@ footer#creator-info a:hover {
   background-color: #ff0000;
 }
 
-/* Fade-in animation for login screen */
+/* Animação de fade-in para a tela de login */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -227,41 +231,24 @@ footer#creator-info a:hover {
   }
 }
 
-/* Ajustes específicos para telas menores */
 @media (max-width: 768px) {
-  body {
-    display: block;
+  #user-list {
+    width: 100%;
+    height: auto;
+    border-right: none;
   }
 
   #chat-container {
     flex-direction: column;
-    width: 100%;
-  }
-
-  #user-list {
-    width: 100%;
-    border-right: none;
-    height: auto;
-    padding: 10px;
   }
 
   #chat-area {
-    width: 100%;
-    height: auto;
-    margin-top: 10px;
+    margin-top: 20px;
   }
 
-  #messages {
-    height: 300px; /* Definir uma altura específica para o chat em mobile */
-  }
-
-  .chat-input {
-    flex-direction: column;
-  }
-
-  #send-button {
-    width: 100%;
-    margin-top: 10px;
-    margin-left: 0;
+  /* Assegura que as imagens e avatares se ajustem no mobile */
+  .user-item img {
+    width: 30px;
+    height: 30px;
   }
 }
